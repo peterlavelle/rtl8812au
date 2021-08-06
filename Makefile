@@ -1,3 +1,10 @@
+##Commands to determine what system we're running on
+
+#Check what model of the pi board we are running on (e.g, 3 or 4) 
+#should contain a value if we are running on a pi, otherwise it will not contain anything
+RASPI_MODEL := $(shell cat /proc/cpuinfo | grep -i "Model" | cut -d: -f2 | grep "Raspberry" | cut -d' ' -f4)
+
+
 EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS) -fno-pie
 EXTRA_CFLAGS += -O3
 EXTRA_CFLAGS += -Wno-unused-variable
@@ -94,8 +101,6 @@ CONFIG_MP_VHT_HW_TX_MODE = n
 ###################### Platform Related #######################
 CONFIG_PLATFORM_I386_PC = y
 CONFIG_PLATFORM_ANDROID_ARM64 = n
-CONFIG_PLATFORM_ARM_RPI = n
-CONFIG_PLATFORM_ARM64_RPI = n
 CONFIG_PLATFORM_ARM_NV_NANO = n
 CONFIG_PLATFORM_ANDROID_X86 = n
 CONFIG_PLATFORM_ANDROID_INTEL_X86 = n
@@ -160,6 +165,21 @@ CONFIG_PLATFORM_AML_S905 = n
 CONFIG_PLATFORM_ZTE_ZX296716 = n
 CONFIG_PLATFORM_ARM_ODROIDC2 = n
 CONFIG_PLATFORM_PPC = n
+
+# Check if we're compiling this on a raspberry pi < 3
+ifeq ($(shell test $(RASPI_MODEL) -lt 3; echo $$?), 0)
+CONFIG_PLATFORM_I386_PC = n
+CONFIG_PLATFORM_ARM_RPI = y
+CONFIG_PLATFORM_ARM64_RPI = n
+endif
+
+# check if we're compiling on a pi 3/4
+ifeq ($(shell test $(RASPI_MODEL) -ge 3; echo $$?), 0)
+CONFIG_PLATFORM_I386_PC = n
+CONFIG_PLATFORM_ARM_RPI = n
+CONFIG_PLATFORM_ARM64_RPI = y
+endif
+
 ########### CUSTOMER ################################
 CONFIG_CUSTOMER_HUAWEI_GENERAL = n
 
