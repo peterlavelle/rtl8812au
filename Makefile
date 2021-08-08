@@ -2,13 +2,13 @@
 
 #Check what model of the pi board we are running on (e.g, 3 or 4) 
 #should contain a value if we are running on a pi, otherwise it will not contain anything
-RASPI_MODEL := $(shell /bin/echo -e `cat /proc/cpuinfo | grep -i "Model" | cut -d: -f2 | grep "Raspberry" | cut -d' ' -f4`)
+raspi_model= $$(`cat /proc/cpuinfo | grep -i "Model" | cut -d: -f2 | grep "Raspberry" | cut -d' ' -f4`)
 
 #Pi 3/2/1/0
-RASPI_MODEL_LE_3 := $(shell test $(RASPI_MODEL) -le 3 && echo true)
+RASPI_MODEL_LE_3 = $$(test $(raspi_model) -le 3 && echo true)
 
 #Pi 4
-RASPI_MODEL_EQ_4 := $(shell test $(RASPI_MODEL) -eq 4 && echo true)
+RASPI_MODEL_EQ_4 = $$(test $(raspi_model) -eq 4 && echo true)
 
 
 EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS) -fno-pie
