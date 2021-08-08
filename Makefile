@@ -2,7 +2,13 @@
 
 #Check what model of the pi board we are running on (e.g, 3 or 4) 
 #should contain a value if we are running on a pi, otherwise it will not contain anything
-RASPI_MODEL := $(shell cat /proc/cpuinfo | grep -i "Model" | cut -d: -f2 | grep "Raspberry" | cut -d' ' -f4)
+RASPI_MODEL := $(shell /bin/echo -e `cat /proc/cpuinfo | grep -i "Model" | cut -d: -f2 | grep "Raspberry" | cut -d' ' -f4`)
+
+#Pi 3/2/1/0
+RASPI_MODEL_LE_3 := $(shell test $(RASPI_MODEL) -le 3 && echo true)
+
+#Pi 4
+RASPI_MODEL_EQ_4 := $(shell test $(RASPI_MODEL) -eq 4 && echo true)
 
 
 EXTRA_CFLAGS += $(USER_EXTRA_CFLAGS) -fno-pie
@@ -166,18 +172,20 @@ CONFIG_PLATFORM_ZTE_ZX296716 = n
 CONFIG_PLATFORM_ARM_ODROIDC2 = n
 CONFIG_PLATFORM_PPC = n
 
-# Check if we're compiling this on a raspberry pi < 3
-ifeq ($(shell test $(RASPI_MODEL) -lt 3; echo $$?), 0)
+# Check if we're compiling this on a raspberry pi 3,2,1 or 0
+#ifeq ($(shell test -n "$(RASPI_MODEL)" && test "$(RASPI_MODEL)" -lt 3 && echo $$?), 0)
+ifeq ($(RASPI_MODEL_LE_3), true)
 CONFIG_PLATFORM_I386_PC = n
 CONFIG_PLATFORM_ARM_RPI = y
-CONFIG_PLATFORM_ARM64_RPI = n
+#CONFIG_PLATFORM_ARM64_RPI = n
 endif
 
-# check if we're compiling on a pi 3/4
-ifeq ($(shell test $(RASPI_MODEL) -ge 3; echo $$?), 0)
+# check if we're compiling on a pi 3B 4B
+#ifeq ($(shell test -n "$$RASPI_MODEL" && test $$RASPI_MODEL -ge 3 && echo $$?), 0)
+ifeq ($(RASPI_MODEL_EQ_4), true)
 CONFIG_PLATFORM_I386_PC = n
-CONFIG_PLATFORM_ARM_RPI = n
-CONFIG_PLATFORM_ARM64_RPI = y
+CONFIG_PLATFORM_ARM_RPI = y
+#CONFIG_PLATFORM_ARM64_RPI = n
 endif
 
 ########### CUSTOMER ################################
